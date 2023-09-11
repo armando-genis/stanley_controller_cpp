@@ -131,7 +131,7 @@ int main() {
     double dt = 0.1;
     for (int i = 0; i < 500; i++) {
 
-        vehicle.update(3, 0.2, 0.1); // Steering angle, acceleration, time step
+        vehicle.update(-3, 0.2, 0.1); // Steering angle, acceleration, time step
 
         // Store vehicle data for plotting
         vehicle_x.push_back(vehicle.getX());
