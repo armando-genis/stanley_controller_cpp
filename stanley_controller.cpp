@@ -3,8 +3,10 @@
 #include <Eigen/Dense>
 // ----- TO DISPLAY THE WAYPOINTS ------
 #include "matplotlibcpp.h"  // Include the matplotlib-cpp header
+#include "BicycleModel.h"
+#include <chrono>
+#include <thread>
 namespace plt = matplotlibcpp;  // Use a namespace alias for convenience
-
 
 class StanleyController {
 private:
@@ -29,8 +31,9 @@ public:
     }
 
     void display() const;
-    void plot() const;
+    void plot_waypoints() const;
     void interpolateWaypoints(); 
+    void plot(const std::vector<double>& x_vals, const std::vector<double>& y_vals, const std::vector<double>& thetas);
 
 };
 
@@ -65,17 +68,12 @@ void StanleyController::interpolateWaypoints(){
 
 void StanleyController::display() const {
 
-    // for (const auto& waypoint : waypoints) {
-    //     std::cout << "(" << waypoint[0] << ", " << waypoint[1] << ")" << std::endl;
-    // }
-
     std::cout << "Total number of waypoints: " << waypoints.size() << std::endl;
     std::cout << "Total number of waypoints interpolated: " << wp_interp.size() << std::endl;
 
 }
 
-
-void StanleyController::plot() const {
+void StanleyController::plot_waypoints() const {
     std::vector<double> x_vals, y_vals;
     for (const auto& waypoint : waypoints) {
         x_vals.push_back(waypoint[0]);
@@ -91,15 +89,66 @@ void StanleyController::plot() const {
 }
 
 
-int main() {
+void StanleyController::plot(const std::vector<double>& x_vals, const std::vector<double>& y_vals, const std::vector<double>& thetas){
+    plt::clf();
+    std::vector<double> wp_x, wp_y;
+    for (const auto& waypoint : waypoints) {
+        wp_x.push_back(waypoint[0]);
+        wp_y.push_back(waypoint[1]);
+    }
 
+    plt::plot(wp_x, wp_y, "ro");
+    plt::plot(x_vals, y_vals, "b--");
+
+
+    plt::xlabel("X");
+    plt::ylabel("Y");
+    plt::title("Waypoints and Vehicle Path with Orientation");
+    plt::grid(true);
+    plt::show();
+    try {
+        plt::pause(0.1);
+    } catch (const std::runtime_error& e) {
+        std::cerr << "Runtime error: " << e.what() << std::endl;
+    }
+}
+
+
+int main() {
+    plt::ion();  
     std::vector<double> x = {1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 6.0,6.0,6.0,6.0,6.0,6.0,6.0, 5.0,4.0,3.0,2.0,1.0,0.0,-1.0,-2.0,-3.0,-4.0,-5.0,-6.0,-7.0,-7.0,-7.0,-7.0,-7.0,-7.0,-7.0,-7.0, -6.0,-5.0,-4.0,-3.0,-2.0};
     std::vector<double> y = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0,2.0,3.0,4.0,5.0,6.0,7.0, 7.0,7.0,7.0,7.0,7.0,7.0,7.0,7.0,7.0,7.0,7.0,7.0,7.0, 6.0,5.0,4.0,3.0,2.0,1.0,0.0,0.0,0.0,0.0,0.0,0.0};
 
     StanleyController controller(x, y);
     controller.interpolateWaypoints();
     controller.display();
-    controller.plot();
+    // controller.plot();
+
+
+    BicycleModel vehicle(0.0, 0.0, 0.0, 1.0);
+    std::vector<double> vehicle_x, vehicle_y, vehicle_theta;
+
+    double dt = 0.1;
+    for (int i = 0; i < 500; i++) {
+
+        vehicle.update(3, 0.2, 0.1); // Steering angle, acceleration, time step
+
+        // Store vehicle data for plotting
+        vehicle_x.push_back(vehicle.getX());
+        vehicle_y.push_back(vehicle.getY());
+        vehicle_theta.push_back(vehicle.getTheta());
+
+        // Plot the vehicle's current path with orientation
+        controller.plot(vehicle_x, vehicle_y, vehicle_theta);
+
+        // Pause for a short time to simulate real-time plotting
+        // std::this_thread::sleep_for(std::chrono::milliseconds(100));
+    }
+
+
+    // Keep the plot window open
+    plt::show(true);
+
 
     return 0;
 }

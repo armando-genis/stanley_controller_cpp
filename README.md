@@ -14,6 +14,8 @@
 
 ```bash
   g++ -I/usr/include/eigen3 -I/usr/include/python3.8 stanley_controller.cpp -o stanley_controller -lpython3.8
+  g++ -I/usr/include/eigen3 -I/usr/include/python3.8 BicycleModel.cpp stanley_controller.cpp -o stanley_controller -lpython3.8
+
   ./stanley_controller
 
 ```
