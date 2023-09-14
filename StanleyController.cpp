@@ -17,6 +17,26 @@ size_t StanleyController::getClosestIndex() const{
     return closest_index;
 }
 
+double StanleyController::GetMaxSteer() const{
+    return max_steer;
+}
+
+double StanleyController::GetTargetIdx() const{
+    return target_idx;
+}
+
+double StanleyController::GetErrorFrontAxle() const{
+    return error_front_axle;
+}
+
+double StanleyController::GetPid() const{
+    return pid;
+}
+
+double StanleyController::GetDelta() const{
+    return delta;
+}
+
 double StanleyController::GetNormaliceAngle(double angle){
     // ---------------------------------------------------------------------
     // Normalize an angle to [-pi, pi].
@@ -36,10 +56,6 @@ double StanleyController::GetAngleToRadians(double angle_in_degrees){
     // ---------------------------------------------------------------------
     double radians = angle_in_degrees * (M_PI / 180.0);
     return radians;
-}
-
-double StanleyController::GetMaxSteer() const{
-    return max_steer;
 }
 
 double StanleyController::computeDistance(double x1, double y1, double x2, double y2){
@@ -155,6 +171,21 @@ void StanleyController::computeCrossTrackError(double current_x, double current_
     double front_axle_vec[2] = {-std::cos(current_yaw + M_PI / 2), -std::sin(current_yaw + M_PI / 2)};
     error_front_axle = (fx - new_waypoints[target_idx](0)) * front_axle_vec[0] + (fy - new_waypoints[target_idx](1)) * front_axle_vec[1];
 
+}
+
+
+void StanleyController::computePID(double target, double current){
+    pid = Kp * (target - current);
+}
+
+
+void StanleyController::computeSteeringAngle(double current_yaw, double v){
+
+    double yaw_path = std::atan2(new_waypoints.back()[1]-new_waypoints.front()[1], new_waypoints.back()[0]-new_waypoints.front()[0]);
+    double theta_e = GetNormaliceAngle(yaw_path - current_yaw);
+    // theta_e corrects the heading error
+    double theta_d = atan2(K * error_front_axle, v);
+    delta = theta_e - theta_d;
 }
 
 

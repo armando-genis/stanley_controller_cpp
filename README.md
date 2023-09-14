@@ -28,4 +28,8 @@ g++ -I/usr/include/eigen3 -I/usr/include/python3.10 BicycleModel.cpp StanleyCont
   ./stanley_animation
 
 
+
 ```
+
+
+http://www.gnuplot.info/

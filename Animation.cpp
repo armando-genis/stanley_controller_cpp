@@ -55,9 +55,11 @@ void animation_car(const vector<Eigen::VectorXd> waypoints,const vector<double>&
     for (int i = 0; i < 500; i++) {
         controller.findClosestWaypoint(vehicle.getX(), vehicle.getY(), wp_distance, wp_interp_hash, wp_interp);
 
-        vehicle.update(5, 0.2, 0.1,controller.GetMaxSteer()); // Steering angle, acceleration, time step
-        // std::cout << vehicle.getYaw() << std::endl;
+        
 
+        // vehicle.update(0, 0.01, 0.1,controller.GetMaxSteer());
+        cout << "Vehicle yaw: " << vehicle.getYaw() << std::endl;
+        double velocity = vehicle.getV();
         // Store vehicle data for plotting
         vehicle_x.push_back(vehicle.getX());
         vehicle_y.push_back(vehicle.getY());
@@ -66,9 +68,27 @@ void animation_car(const vector<Eigen::VectorXd> waypoints,const vector<double>&
         // Find the closest waypoint to the vehicle
         
         size_t ClosestIndex = controller.getClosestIndex();
-        std::cout << "ClosestIndex: " << ClosestIndex << std::endl;
-        std::cout << "maxSteering: " << controller.GetMaxSteer() << std::endl;
+        // std::cout << "maxSteering: " << controller.GetMaxSteer() << std::endl;
 
+        vector<Eigen::VectorXd> new_waypoints = controller.getNewWaypoints();
+        controller.computeCrossTrackError(vehicle.getX(), vehicle.getY(), vehicle.getYaw());
+        double target_idx = controller.GetTargetIdx();
+        cout << "target_idx: " << target_idx << endl;
+        cout << "error_front_axle: " << controller.GetErrorFrontAxle() << endl;
+        // std::cout << "ClosestIndex: " << ClosestIndex << std::endl;
+        // std::cout << "new_waypoints size: " << new_waypoints.size() << std::endl;
+        std::cout << "new_waypoints in x: " << new_waypoints[target_idx](0) << std::endl;
+        std::cout << "new_waypoints in y: " << new_waypoints[target_idx](1) << std::endl;
+
+        double x_target = new_waypoints[target_idx](0);
+        double y_target = new_waypoints[target_idx](1);
+
+        double target_speed = 30.0 / 3.6; // [m/s] 30 km/h to [m/s]
+        controller.computePID(target_speed, velocity);
+        controller.computeSteeringAngle(vehicle.getYaw(), velocity);
+        // std::cout << "new_waypoints: " << new_waypoints[1] << std::endl;
+        vehicle.update(controller.GetDelta(), controller.GetPid(), 0.1,controller.GetMaxSteer());
+        
         plt::clf();
         vector<double> wp_x, wp_y;
         for (const auto& waypoint : waypoints) {
@@ -81,8 +101,13 @@ void animation_car(const vector<Eigen::VectorXd> waypoints,const vector<double>&
             wp_y2.push_back(waypoint[1]);
         }
 
+
+        vector<double> x_target_vec = {x_target};
+        vector<double> y_target_vec = {y_target};
+
         plt::plot(wp_x, wp_y, "ro");
         plt::plot(wp_x2, wp_y2, "go");
+        plt::plot(x_target_vec, y_target_vec, "bo");
         plt::named_plot("subset of waypoints", wp_x2, wp_y2);
         plt::named_plot("waypoints", wp_x, wp_y);
         plt::named_plot("vehicle", vehicle_x, vehicle_y);
