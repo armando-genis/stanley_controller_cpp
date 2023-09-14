@@ -3,13 +3,15 @@
 
 BicycleModel::BicycleModel(double x0, double y0, double theta0, double v0) : x(x0), y(y0), theta(theta0), v(v0) {}
 
-void BicycleModel::update(double delta, double a, double dt) {
-    double beta = atan(0.5 * tan(delta));
-    x += v * cos(theta + beta) * dt;
-    y += v * sin(theta + beta) * dt;
-    theta += v * cos(beta) * tan(delta) / L * dt;
-    yaw = GetNormaliceAngle(theta);
+void BicycleModel::update(double delta, double a, double dt, double max_steer) {
+    delta = std::min(std::max(delta, -max_steer), max_steer);
+    double beta = std::atan(0.5 * std::tan(delta));
+    x += v * std::cos(yaw + beta) * dt;
+    y += v * std::sin(yaw + beta) * dt;
+    yaw += (v * std::cos(beta) * std::tan(delta) / L) * dt;
+    yaw = GetNormaliceAngle(yaw);
     v += a * dt;
+
 }
 
 double BicycleModel::getX() const { return x; }

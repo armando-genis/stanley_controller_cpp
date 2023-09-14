@@ -6,6 +6,7 @@ StanleyController::StanleyController(vector<Eigen::VectorXd> waypoints) : waypoi
 
 StanleyController::~StanleyController()
 {
+
 }
 
 vector<Eigen::VectorXd> StanleyController::getNewWaypoints() const{
@@ -33,8 +34,12 @@ double StanleyController::GetAngleToRadians(double angle_in_degrees){
     // :param angle_in_degrees: (double) 
     // :return: (double) angle in radian
     // ---------------------------------------------------------------------
-    double degrees = degrees * (180.0 / M_PI);
-    return degrees;
+    double radians = angle_in_degrees * (M_PI / 180.0);
+    return radians;
+}
+
+double StanleyController::GetMaxSteer() const{
+    return max_steer;
 }
 
 double StanleyController::computeDistance(double x1, double y1, double x2, double y2){
@@ -126,6 +131,31 @@ void StanleyController::findClosestWaypoint(double current_x, double current_y,c
     new_waypoints = new_waypoints_data;
 }
 
+
+void StanleyController::computeCrossTrackError(double current_x, double current_y, double current_yaw){
+    double fx = current_x + L * cos(current_yaw);
+    double fy = current_y + L * sin(current_yaw);
+    // Search nearest point index
+
+    // Search nearest point index
+    target_idx = 0;
+    double min_dist = std::numeric_limits<double>::max();
+
+    for (int i = 0; i < new_waypoints.size(); i++) {
+        double dx = fx - new_waypoints[i](0);  // Access x-coordinate of Eigen::VectorXd
+        double dy = fy - new_waypoints[i](1);  // Access y-coordinate of Eigen::VectorXd
+        double dist = std::sqrt(dx * dx + dy * dy);
+
+        if (dist < min_dist) {
+            min_dist = dist;
+            target_idx = i;
+        }
+    }
+
+    double front_axle_vec[2] = {-std::cos(current_yaw + M_PI / 2), -std::sin(current_yaw + M_PI / 2)};
+    error_front_axle = (fx - new_waypoints[target_idx](0)) * front_axle_vec[0] + (fy - new_waypoints[target_idx](1)) * front_axle_vec[1];
+
+}
 
 
 // void StanleyController::Controller_Stanley(const double yaw,const std::vector<Eigen::VectorXd> waypoints, const double x, const double y, const double v, const double a, const double steer, const double dt){

@@ -8,7 +8,7 @@ private:
 
 public:
     BicycleModel(double x0, double y0, double theta0, double v0);
-    void update(double delta, double a, double dt);
+    void update(double delta, double a, double dt, double max_steer);
     double getX() const;
     double getY() const;
     double getTheta() const;

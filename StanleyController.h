@@ -17,6 +17,9 @@ private:
     const double max_steer = GetAngleToRadians(30); // [rad] max steering angle
     size_t closest_index; // Closaest waypoint index
     vector<Eigen::VectorXd> new_waypoints; //subset of waypoints
+    double error_front_axle = 0.0;
+    double target_idx = 0.0;
+
 
 public:
     StanleyController(vector<Eigen::VectorXd> waypoints);
@@ -27,9 +30,12 @@ public:
     double computeDistance(double x1, double y1, double x2, double y2);
     // function to find the closest waypoint to the car
     void findClosestWaypoint(double current_x, double current_y,const vector<double>& wp_distance, const vector<int>& wp_interp_hash, const vector<Eigen::VectorXd>& wp_interp);
+    // function to compute the cross track error and get the target of the new waypoints
+    void computeCrossTrackError(double current_x, double current_y, double current_yaw);
     // function to return data
     vector<Eigen::VectorXd> getNewWaypoints() const;
     size_t getClosestIndex() const;
+    double GetMaxSteer() const;
 
     // void Controller();
 };

@@ -53,9 +53,10 @@ void animation_car(const vector<Eigen::VectorXd> waypoints,const vector<double>&
     std::vector<double> vehicle_x, vehicle_y, vehicle_theta;
         double dt = 0.1;
     for (int i = 0; i < 500; i++) {
+        controller.findClosestWaypoint(vehicle.getX(), vehicle.getY(), wp_distance, wp_interp_hash, wp_interp);
 
-        vehicle.update(-3, 0.2, 0.1); // Steering angle, acceleration, time step
-        std::cout << vehicle.getYaw() << std::endl;
+        vehicle.update(5, 0.2, 0.1,controller.GetMaxSteer()); // Steering angle, acceleration, time step
+        // std::cout << vehicle.getYaw() << std::endl;
 
         // Store vehicle data for plotting
         vehicle_x.push_back(vehicle.getX());
@@ -63,7 +64,10 @@ void animation_car(const vector<Eigen::VectorXd> waypoints,const vector<double>&
         vehicle_theta.push_back(vehicle.getTheta());
 
         // Find the closest waypoint to the vehicle
-        controller.findClosestWaypoint(vehicle.getX(), vehicle.getY(), wp_distance, wp_interp_hash, wp_interp);
+        
+        size_t ClosestIndex = controller.getClosestIndex();
+        std::cout << "ClosestIndex: " << ClosestIndex << std::endl;
+        std::cout << "maxSteering: " << controller.GetMaxSteer() << std::endl;
 
         plt::clf();
         vector<double> wp_x, wp_y;
@@ -79,9 +83,11 @@ void animation_car(const vector<Eigen::VectorXd> waypoints,const vector<double>&
 
         plt::plot(wp_x, wp_y, "ro");
         plt::plot(wp_x2, wp_y2, "go");
-        plt::plot(vehicle_x, vehicle_y, "b--");
-
-
+        plt::named_plot("subset of waypoints", wp_x2, wp_y2);
+        plt::named_plot("waypoints", wp_x, wp_y);
+        plt::named_plot("vehicle", vehicle_x, vehicle_y);
+        plt::legend();  // Show the legend to access the plot's properties
+        
         plt::xlabel("X");
         plt::ylabel("Y");
         plt::title("Waypoints and Vehicle Path with Orientation");
