@@ -8,7 +8,11 @@
 #include "Linear_Interpolation.h"
 #include "matplotlibcpp.h"  // Include the matplotlib-cpp header
 #include "BicycleModel.h"
+#include "StanleyController.h"
+
+using namespace std;
 namespace plt = matplotlibcpp;
+
 
 
 void plot_waypoints( const std::vector<Eigen::VectorXd> waypoints){
@@ -41,30 +45,40 @@ void plot_waypoints_interpolation( const std::vector<Eigen::VectorXd> waypoints)
     plt::show();
 }
 
-void animation_car(const std::vector<Eigen::VectorXd> waypoints){
+void animation_car(const vector<Eigen::VectorXd> waypoints,const vector<double>& wp_distance, const vector<int>& wp_interp_hash, const vector<Eigen::VectorXd>& wp_interp){
     plt::ion();  
     BicycleModel vehicle(0.0, 0.0, 0.0, 1.0);
+    StanleyController controller(waypoints);
+
     std::vector<double> vehicle_x, vehicle_y, vehicle_theta;
         double dt = 0.1;
     for (int i = 0; i < 500; i++) {
 
         vehicle.update(-3, 0.2, 0.1); // Steering angle, acceleration, time step
+        std::cout << vehicle.getYaw() << std::endl;
 
         // Store vehicle data for plotting
         vehicle_x.push_back(vehicle.getX());
         vehicle_y.push_back(vehicle.getY());
         vehicle_theta.push_back(vehicle.getTheta());
 
-        // Plot the vehicle's current path with orientation
-        // controller.plot(vehicle_x, vehicle_y, vehicle_theta);
+        // Find the closest waypoint to the vehicle
+        controller.findClosestWaypoint(vehicle.getX(), vehicle.getY(), wp_distance, wp_interp_hash, wp_interp);
+
         plt::clf();
-        std::vector<double> wp_x, wp_y;
+        vector<double> wp_x, wp_y;
         for (const auto& waypoint : waypoints) {
             wp_x.push_back(waypoint[0]);
             wp_y.push_back(waypoint[1]);
         }
+        vector<double> wp_x2, wp_y2;
+        for (const auto& waypoint : controller.getNewWaypoints()) {
+            wp_x2.push_back(waypoint[0]);
+            wp_y2.push_back(waypoint[1]);
+        }
 
         plt::plot(wp_x, wp_y, "ro");
+        plt::plot(wp_x2, wp_y2, "go");
         plt::plot(vehicle_x, vehicle_y, "b--");
 
 
@@ -101,7 +115,7 @@ int main() {
     std::cout << "wp_interp size: " << wp_interp.size() << std::endl;
     std::cout << "wp_interp_hash size: " << wp_interp_hash.size() << std::endl;
     std::vector<Eigen::VectorXd> waypoints = linear_interpolation.getWaypoints();
-    plot_waypoints(waypoints);
-    plot_waypoints_interpolation(wp_interp);
-    animation_car(waypoints);
+    // plot_waypoints(waypoints);
+    // plot_waypoints_interpolation(wp_interp);
+    animation_car(waypoints, wp_distance, wp_interp_hash, wp_interp);
 }

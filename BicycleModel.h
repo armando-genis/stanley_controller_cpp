@@ -1,9 +1,9 @@
 #ifndef BICYCLEMODEL_H
 #define BICYCLEMODEL_H
-
+#include <cmath>
 class BicycleModel {
 private:
-    double x, y, theta, v;
+    double x, y, theta, v, yaw;
     const double L = 2.0;
 
 public:
@@ -13,6 +13,8 @@ public:
     double getY() const;
     double getTheta() const;
     double getV() const;
+    double getYaw() const;
+    double GetNormaliceAngle(double angle);
 };
 
 #endif

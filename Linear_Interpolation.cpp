@@ -53,10 +53,12 @@ double Linear_Interpolation::getSize() const{
 }
 
 std::vector<Eigen::VectorXd> Linear_Interpolation::getWaypoints() const{
+    // return the waypoints in a eigen vector
     return waypoints;
 }
 
 std::vector<Eigen::VectorXd> Linear_Interpolation::getWp_interp() const{
+    // return the new waypoints 
     return wp_interp;
 }
 
