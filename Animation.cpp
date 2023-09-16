@@ -13,8 +13,6 @@
 using namespace std;
 namespace plt = matplotlibcpp;
 
-
-
 void plot_waypoints( const std::vector<Eigen::VectorXd> waypoints){
     std::vector<double> x_vals, y_vals;
     for (const auto& waypoint : waypoints) {
@@ -60,8 +58,6 @@ void animation_car(const vector<Eigen::VectorXd> waypoints,const vector<double>&
         cout << "vehicle y: " << vehicle.getY() << endl;
         controller.findClosestWaypoint(vehicle.getX(), vehicle.getY(), wp_distance, wp_interp_hash, wp_interp);
 
-        
-
         // vehicle.update(0, 0.01, 0.1,controller.GetMaxSteer());
         cout << "Vehicle yaw: " << vehicle.getYaw() << std::endl;
         double velocity = vehicle.getV();
@@ -95,7 +91,7 @@ void animation_car(const vector<Eigen::VectorXd> waypoints,const vector<double>&
         controller.computePID(target_speed, velocity);
         controller.computeSteeringAngle(vehicle.getYaw(), velocity);
         // std::cout << "new_waypoints: " << new_waypoints[1] << std::endl;
-        vehicle.update(controller.GetDelta(), 0.01, 0.1,controller.GetMaxSteer());
+        vehicle.update(controller.GetDelta(), controller.GetPid(), 0.1,controller.GetMaxSteer());
         cout << " steering angle: " << controller.GetDelta() << endl;
         
         plt::clf();
@@ -149,8 +145,6 @@ void animation_car(const vector<Eigen::VectorXd> waypoints,const vector<double>&
     
 }
 
-
-
 int main() {
     std::vector<double> x = {1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 6.0,6.0,6.0,6.0,6.0,6.0,6.0, 5.0,4.0,3.0,2.0,1.0,0.0,-1.0,-2.0,-3.0,-4.0,-5.0,-6.0,-7.0,-7.0,-7.0,-7.0,-7.0,-7.0,-7.0,-7.0, -6.0,-5.0,-4.0,-3.0,-2.0};
     std::vector<double> y = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0,2.0,3.0,4.0,5.0,6.0,7.0, 7.0,7.0,7.0,7.0,7.0,7.0,7.0,7.0,7.0,7.0,7.0,7.0,7.0, 6.0,5.0,4.0,3.0,2.0,1.0,0.0,0.0,0.0,0.0,0.0,0.0};
@@ -158,8 +152,7 @@ int main() {
     // std::vector<double> x = {0.0, 100.0, 100.0, 50.0, 60.0};
     // std::vector<double> y = {0.0, 0.0, -30.0, -20.0, 0.0};
 
-
-    Linear_Interpolation linear_interpolation(x, y, 0.01);
+    Linear_Interpolation linear_interpolation(x, y, 0.1);
     linear_interpolation.interpolateWaypoints();
     std::vector<Eigen::VectorXd> wp_interp = linear_interpolation.getWp_interp();
     std::vector<int> wp_interp_hash = linear_interpolation.getWp_interp_hash();
