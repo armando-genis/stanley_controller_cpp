@@ -20,7 +20,7 @@ Linear_Interpolation::~Linear_Interpolation()
     std::cout << "Linear_Interpolation Destructor called" << std::endl;
 }   
 
-void Linear_Interpolation::interpolateWaypoints(){
+void Linear_Interpolation::interpolateWaypoints() {
     for (size_t i = 1; i < waypoints.size(); i++) {
         Eigen::VectorXd diff = waypoints[i] - waypoints[i - 1];
         wp_distance.push_back(diff.norm());
@@ -30,7 +30,9 @@ void Linear_Interpolation::interpolateWaypoints(){
     int interp_counter = 0;
 
     for (size_t i = 0; i < waypoints.size() - 1; i++) {
-        wp_interp.push_back(waypoints[i]);
+        Eigen::VectorXd point_with_yaw(3);
+        point_with_yaw << waypoints[i](0), waypoints[i](1), 0.0; // default yaw
+        wp_interp.push_back(point_with_yaw);
         wp_interp_hash.push_back(interp_counter);
         interp_counter++;
 
@@ -40,11 +42,23 @@ void Linear_Interpolation::interpolateWaypoints(){
 
         for (int j = 0; j < num_pts_to_interp; j++) {
             Eigen::VectorXd next_wp_vector = INTERP_DISTANCE_RES * static_cast<double>(j + 1) * wp_uvector;
-            wp_interp.push_back(waypoints[i] + next_wp_vector);
+            Eigen::VectorXd next_point(2);
+            next_point = waypoints[i] + next_wp_vector;
+            
+            double dy = next_point(1) - waypoints[i](1);
+            double dx = next_point(0) - waypoints[i](0);
+            double yaw = std::atan2(dy, dx);
+            
+            Eigen::VectorXd next_point_with_yaw(3);
+            next_point_with_yaw << next_point(0), next_point(1), yaw;
+
+            wp_interp.push_back(next_point_with_yaw);
             interp_counter++;
         }
     }
-    wp_interp.push_back(waypoints.back());
+    Eigen::VectorXd last_point_with_yaw(3);
+    last_point_with_yaw << waypoints.back()(0), waypoints.back()(1), 0.0; // default yaw for last point
+    wp_interp.push_back(last_point_with_yaw);
     wp_interp_hash.push_back(interp_counter);
 }
 

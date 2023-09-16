@@ -91,7 +91,7 @@ void animation_car(const vector<Eigen::VectorXd> waypoints,const vector<double>&
         controller.computePID(target_speed, velocity);
         controller.computeSteeringAngle(vehicle.getYaw(), velocity);
         // std::cout << "new_waypoints: " << new_waypoints[1] << std::endl;
-        vehicle.update(controller.GetDelta(), controller.GetPid(), 0.1,controller.GetMaxSteer());
+        vehicle.update(controller.GetDelta(), 0.01, 0.1,controller.GetMaxSteer());
         cout << " steering angle: " << controller.GetDelta() << endl;
         
         plt::clf();

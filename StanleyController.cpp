@@ -180,10 +180,22 @@ void StanleyController::computePID(double target, double current){
 
 void StanleyController::computeSteeringAngle(double current_yaw, double v){
     current_yaw = GetNormaliceAngle(current_yaw);
+    double yaw_target = std::atan2(new_waypoints[target_idx][1]-new_waypoints[target_idx-1][1], new_waypoints[target_idx][0]-new_waypoints[target_idx-1][0]);
+    double yaw_target2 = new_waypoints[target_idx](2);
+    yaw_target = GetNormaliceAngle(yaw_target);
+    yaw_target2 = GetNormaliceAngle(yaw_target2);
+
+
+
+
     double yaw_path = std::atan2(new_waypoints.back()[1]-new_waypoints.front()[1], new_waypoints.back()[0]-new_waypoints.front()[0]);
     yaw_path = GetNormaliceAngle(yaw_path);
+
+
+    cout << "yaw_target: " << yaw_target << endl;
+    cout << "yaw_target2: " << yaw_target2 << endl;
     cout << "yaw_path: " << yaw_path << endl;
-    double theta_e = GetNormaliceAngle(yaw_path - current_yaw);
+    double theta_e = GetNormaliceAngle(yaw_target - current_yaw);
     // theta_e corrects the heading error
     double theta_d = atan2(K * error_front_axle, v);
     delta = theta_e + theta_d;
