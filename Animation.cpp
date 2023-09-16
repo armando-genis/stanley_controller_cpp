@@ -49,7 +49,7 @@ void animation_car(const vector<Eigen::VectorXd> waypoints,const vector<double>&
     StanleyController controller(waypoints);
 
     std::vector<double> vehicle_x, vehicle_y, vehicle_theta;
-        double dt = 0.1;
+    double dt = 0.1;
     for (int i = 0; i < 500; i++) {
 
         cout << "hola111111111111111111111111111111111111" << endl;
@@ -91,7 +91,7 @@ void animation_car(const vector<Eigen::VectorXd> waypoints,const vector<double>&
         controller.computePID(target_speed, velocity);
         controller.computeSteeringAngle(vehicle.getYaw(), velocity);
         // std::cout << "new_waypoints: " << new_waypoints[1] << std::endl;
-        vehicle.update(controller.GetDelta(), 0.01, 0.1,controller.GetMaxSteer());
+        vehicle.update(controller.GetDelta(), controller.GetPid(), 0.1,controller.GetMaxSteer());
         cout << " steering angle: " << controller.GetDelta() << endl;
         
         plt::clf();
@@ -151,6 +151,12 @@ int main() {
 
     // std::vector<double> x = {0.0, 100.0, 100.0, 50.0, 60.0};
     // std::vector<double> y = {0.0, 0.0, -30.0, -20.0, 0.0};
+
+
+    const double PI = 3.141592653589793;
+    const double radius = 7.0;
+
+
 
     Linear_Interpolation linear_interpolation(x, y, 0.1);
     linear_interpolation.interpolateWaypoints();

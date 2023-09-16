@@ -2,7 +2,7 @@
 
 StanleyController::StanleyController(vector<Eigen::VectorXd> waypoints) : waypoints(waypoints)
 {
-    max_steer = GetAngleToRadians(30);
+    max_steer = GetAngleToRadians(30.0);
 }
 
 StanleyController::~StanleyController()
@@ -184,9 +184,8 @@ void StanleyController::computeSteeringAngle(double current_yaw, double v){
     double yaw_target2 = new_waypoints[target_idx](2);
     yaw_target = GetNormaliceAngle(yaw_target);
     yaw_target2 = GetNormaliceAngle(yaw_target2);
-
-
-
+    double yaw_of_the_last_point = std::atan2(new_waypoints.back()[1]-new_waypoints[new_waypoints.size()-2][1], new_waypoints.back()[0]-new_waypoints[new_waypoints.size()-2][0]);
+    yaw_of_the_last_point = GetNormaliceAngle(yaw_of_the_last_point);
 
     double yaw_path = std::atan2(new_waypoints.back()[1]-new_waypoints.front()[1], new_waypoints.back()[0]-new_waypoints.front()[0]);
     yaw_path = GetNormaliceAngle(yaw_path);
@@ -195,7 +194,7 @@ void StanleyController::computeSteeringAngle(double current_yaw, double v){
     cout << "yaw_target: " << yaw_target << endl;
     cout << "yaw_target2: " << yaw_target2 << endl;
     cout << "yaw_path: " << yaw_path << endl;
-    double theta_e = GetNormaliceAngle(yaw_target - current_yaw);
+    double theta_e = GetNormaliceAngle(yaw_path - current_yaw);
     // theta_e corrects the heading error
     double theta_d = atan2(K * error_front_axle, v);
     delta = theta_e + theta_d;

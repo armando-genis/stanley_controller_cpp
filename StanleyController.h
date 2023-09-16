@@ -12,7 +12,7 @@ class StanleyController
 private:
     vector<Eigen::VectorXd> waypoints; 
     double L = 2.0; // [m] Wheel base of vehicle
-    double K = 1.5;  // control gain
+    double K = 6.5;  // control gain
     double Kp = 1.0; // speed proportional gain
     double max_steer = 0.0; // [rad] max steering angle
     size_t closest_index = 0.0; // Closaest waypoint index
