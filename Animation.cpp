@@ -53,6 +53,11 @@ void animation_car(const vector<Eigen::VectorXd> waypoints,const vector<double>&
     std::vector<double> vehicle_x, vehicle_y, vehicle_theta;
         double dt = 0.1;
     for (int i = 0; i < 500; i++) {
+
+        cout << "hola111111111111111111111111111111111111" << endl;
+
+        cout << "vehicle x: " << vehicle.getX() << endl;
+        cout << "vehicle y: " << vehicle.getY() << endl;
         controller.findClosestWaypoint(vehicle.getX(), vehicle.getY(), wp_distance, wp_interp_hash, wp_interp);
 
         
@@ -77,17 +82,21 @@ void animation_car(const vector<Eigen::VectorXd> waypoints,const vector<double>&
         cout << "error_front_axle: " << controller.GetErrorFrontAxle() << endl;
         // std::cout << "ClosestIndex: " << ClosestIndex << std::endl;
         // std::cout << "new_waypoints size: " << new_waypoints.size() << std::endl;
-        std::cout << "new_waypoints in x: " << new_waypoints[target_idx](0) << std::endl;
-        std::cout << "new_waypoints in y: " << new_waypoints[target_idx](1) << std::endl;
+        // std::cout << "new_waypoints in x: " << new_waypoints[target_idx](0) << std::endl;
+        // std::cout << "new_waypoints in y: " << new_waypoints[target_idx](1) << std::endl;
 
         double x_target = new_waypoints[target_idx](0);
         double y_target = new_waypoints[target_idx](1);
+
+        double cosestindex_x = waypoints[ClosestIndex](0);
+        double cosestindex_y = waypoints[ClosestIndex](1);
 
         double target_speed = 30.0 / 3.6; // [m/s] 30 km/h to [m/s]
         controller.computePID(target_speed, velocity);
         controller.computeSteeringAngle(vehicle.getYaw(), velocity);
         // std::cout << "new_waypoints: " << new_waypoints[1] << std::endl;
-        vehicle.update(controller.GetDelta(), controller.GetPid(), 0.1,controller.GetMaxSteer());
+        vehicle.update(controller.GetDelta(), 0.01, 0.1,controller.GetMaxSteer());
+        cout << " steering angle: " << controller.GetDelta() << endl;
         
         plt::clf();
         vector<double> wp_x, wp_y;
@@ -105,9 +114,16 @@ void animation_car(const vector<Eigen::VectorXd> waypoints,const vector<double>&
         vector<double> x_target_vec = {x_target};
         vector<double> y_target_vec = {y_target};
 
+        vector<double> cosestindex_x_vec = {cosestindex_x};
+        vector<double> cosestindex_y_vec = {cosestindex_y};
+
+
         plt::plot(wp_x, wp_y, "ro");
-        plt::plot(wp_x2, wp_y2, "go");
+        plt::plot(wp_x2, wp_y2, "mo");
+        
         plt::plot(x_target_vec, y_target_vec, "bo");
+        plt::plot(cosestindex_x_vec, cosestindex_y_vec, "ko");
+
         plt::named_plot("subset of waypoints", wp_x2, wp_y2);
         plt::named_plot("waypoints", wp_x, wp_y);
         plt::named_plot("vehicle", vehicle_x, vehicle_y);
@@ -117,6 +133,7 @@ void animation_car(const vector<Eigen::VectorXd> waypoints,const vector<double>&
         plt::ylabel("Y");
         plt::title("Waypoints and Vehicle Path with Orientation");
         plt::grid(true);
+
         plt::show();
         try {
             plt::pause(0.1);

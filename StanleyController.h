@@ -11,22 +11,21 @@ class StanleyController
 {
 private:
     vector<Eigen::VectorXd> waypoints; 
-    const double L = 0.0; // [m] Wheel base of vehicle
-    const double K = 0.5;  // control gain
-    const double Kp = 1.0; // speed proportional gain
-    const double max_steer = GetAngleToRadians(30); // [rad] max steering angle
-    size_t closest_index; // Closaest waypoint index
+    double L = 2.0; // [m] Wheel base of vehicle
+    double K = 0.5;  // control gain
+    double Kp = 1.0; // speed proportional gain
+    double max_steer = 0.0; // [rad] max steering angle
+    size_t closest_index = 0.0; // Closaest waypoint index
     vector<Eigen::VectorXd> new_waypoints; //subset of waypoints
     double error_front_axle = 0.0;
     double target_idx = 0.0;
     double pid = 0.0;
     double delta = 0.0;
 
-
 public:
     StanleyController(vector<Eigen::VectorXd> waypoints);
     ~StanleyController();
-    // function to compute the main functions of the controller
+    // function to compute the main functions of the controller (Utility functions)
     double GetNormaliceAngle(double angle);
     double GetAngleToRadians(double angle_in_degrees);
     double computeDistance(double x1, double y1, double x2, double y2);

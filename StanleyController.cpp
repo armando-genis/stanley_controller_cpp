@@ -2,6 +2,7 @@
 
 StanleyController::StanleyController(vector<Eigen::VectorXd> waypoints) : waypoints(waypoints)
 {
+    max_steer = GetAngleToRadians(30);
 }
 
 StanleyController::~StanleyController()
@@ -89,7 +90,7 @@ void StanleyController::findClosestWaypoint(double current_x, double current_y,c
     // :return: (vector<Eigen::VectorXd>) subset of waypoints
     // ---------------------------------------------------------------------
 
-    closest_index = 0;  
+    // closest_index = 0;  
     double closest_distance = computeDistance(waypoints[closest_index][0], waypoints[closest_index][1], current_x, current_y);
     double new_distance = closest_distance;
     size_t new_index = closest_index;
@@ -154,7 +155,7 @@ void StanleyController::computeCrossTrackError(double current_x, double current_
     // Search nearest point index
 
     // Search nearest point index
-    target_idx = 0;
+
     double min_dist = std::numeric_limits<double>::max();
 
     for (int i = 0; i < new_waypoints.size(); i++) {
@@ -170,78 +171,20 @@ void StanleyController::computeCrossTrackError(double current_x, double current_
 
     double front_axle_vec[2] = {-std::cos(current_yaw + M_PI / 2), -std::sin(current_yaw + M_PI / 2)};
     error_front_axle = (fx - new_waypoints[target_idx](0)) * front_axle_vec[0] + (fy - new_waypoints[target_idx](1)) * front_axle_vec[1];
-
 }
-
 
 void StanleyController::computePID(double target, double current){
     pid = Kp * (target - current);
 }
 
-
 void StanleyController::computeSteeringAngle(double current_yaw, double v){
-
     double yaw_path = std::atan2(new_waypoints.back()[1]-new_waypoints.front()[1], new_waypoints.back()[0]-new_waypoints.front()[0]);
-    double theta_e = GetNormaliceAngle(yaw_path - current_yaw);
+    yaw_path = GetNormaliceAngle(yaw_path);
+    cout << "yaw_path: " << yaw_path << endl;
+    double theta_e = yaw_path - current_yaw;
     // theta_e corrects the heading error
     double theta_d = atan2(K * error_front_axle, v);
-    delta = theta_e - theta_d;
+    delta = theta_e + theta_d;
+    cout << "delta: " << delta << endl;
 }
 
-
-// void StanleyController::Controller_Stanley(const double yaw,const std::vector<Eigen::VectorXd> waypoints, const double x, const double y, const double v, const double a, const double steer, const double dt){
-//     // Calc front axle position
-//     double fx = x + L * cos(yaw);
-//     double fy = y + L * sin(yaw);
-//     // Search nearest point index
-//     double min_dist = 1e9;
-//     int min_index = 0;
-
-//     for (int i = 0; i < waypoints.size(); i++) {
-//         double dx = fx - waypoints[i][0];
-//         double dy = fy - waypoints[i][1];
-//         double dist = sqrt(pow(dx, 2) + pow(dy, 2));
-//         if (dist < min_dist) {
-//             min_dist = dist;
-//             min_index = i;
-//         }
-//     }
-//     return min_index;
-
-// }
-
-
-
-
-
-    // double alpha = atan2(fy - waypoints[0][1], fx - waypoints[0][0]) - waypoints[0][2];
-    // double crosstrack_error = sin(alpha) * sqrt(pow(fx - waypoints[0][0], 2) + pow(fy - waypoints[0][1], 2));
-    // double theta_e = GetNormaliceAngle(yaw - waypoints[0][2]);
-    // double theta_d = atan2(K * crosstrack_error, v);
-    // double steer_angle = theta_e + theta_d;
-    // steer_angle = GetNormaliceAngle(steer_angle);
-    // steer_angle = std::max(std::min(steer_angle, max_steer), -max_steer);
-    // double delta = steer_angle - steer;
-    // delta = GetNormaliceAngle(delta);
-    // double a = Kp * (v - waypoints[0][3]);
-    // return delta, a; 
-
-
-
-        // // # Calc crosstrack error
-    // double alpha = atan2(fy - waypoints[min_index][1], fx - waypoints[min_index][0]) - waypoints[min_index][2];
-    // double crosstrack_error = sin(alpha) * sqrt(pow(fx - waypoints[min_index][0], 2) + pow(fy - waypoints[min_index][1], 2));
-    // // # Calc alongtrack error
-    // double alongtrack_error = cos(alpha) * sqrt(pow(fx - waypoints[min_index][0], 2) + pow(fy - waypoints[min_index][1], 2));
-    // // # Calc theta_e
-    // double theta_e = GetNormaliceAngle(yaw - waypoints[min_index][2]);
-    // // # Calc theta_d
-    // double theta_d = atan2(K * crosstrack_error, v);
-    // // # Calc steer angle
-    // double steer_angle = theta_e + theta_d;
-    // steer_angle = GetNormaliceAngle(steer_angle);
-    // steer_angle = std::max(std::min(steer_angle, max_steer), -max_steer);
-    // double delta = steer_angle - steer;
-    // delta = GetNormaliceAngle(delta);
-    // double a = Kp * (v - waypoints[min_index][3]);
-    // return delta, a;
