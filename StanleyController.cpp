@@ -131,7 +131,7 @@ void StanleyController::findClosestWaypoint(double current_x, double current_y,c
     size_t waypoint_subset_last_index = closest_index;
     double total_distance_ahead = 0.0;
 
-    while (total_distance_ahead < 2) {
+    while (total_distance_ahead < 3) {
         if (waypoint_subset_last_index >= waypoints.size() || waypoint_subset_last_index >= wp_distance.size()) {
             waypoint_subset_last_index = std::min(waypoints.size(), wp_distance.size()) - 1;
             break;
@@ -150,6 +150,7 @@ void StanleyController::findClosestWaypoint(double current_x, double current_y,c
 
 
 void StanleyController::computeCrossTrackError(double current_x, double current_y, double current_yaw){
+    current_yaw = GetNormaliceAngle(current_yaw);
     double fx = current_x + L * cos(current_yaw);
     double fy = current_y + L * sin(current_yaw);
     // Search nearest point index
@@ -178,6 +179,7 @@ void StanleyController::computePID(double target, double current){
 }
 
 void StanleyController::computeSteeringAngle(double current_yaw, double v){
+    current_yaw = GetNormaliceAngle(current_yaw);
     double yaw_path = std::atan2(new_waypoints.back()[1]-new_waypoints.front()[1], new_waypoints.back()[0]-new_waypoints.front()[0]);
     yaw_path = GetNormaliceAngle(yaw_path);
     cout << "yaw_path: " << yaw_path << endl;

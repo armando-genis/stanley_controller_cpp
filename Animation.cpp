@@ -154,7 +154,11 @@ void animation_car(const vector<Eigen::VectorXd> waypoints,const vector<double>&
 int main() {
     std::vector<double> x = {1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 6.0,6.0,6.0,6.0,6.0,6.0,6.0, 5.0,4.0,3.0,2.0,1.0,0.0,-1.0,-2.0,-3.0,-4.0,-5.0,-6.0,-7.0,-7.0,-7.0,-7.0,-7.0,-7.0,-7.0,-7.0, -6.0,-5.0,-4.0,-3.0,-2.0};
     std::vector<double> y = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0,2.0,3.0,4.0,5.0,6.0,7.0, 7.0,7.0,7.0,7.0,7.0,7.0,7.0,7.0,7.0,7.0,7.0,7.0,7.0, 6.0,5.0,4.0,3.0,2.0,1.0,0.0,0.0,0.0,0.0,0.0,0.0};
-    
+
+    // std::vector<double> x = {0.0, 100.0, 100.0, 50.0, 60.0};
+    // std::vector<double> y = {0.0, 0.0, -30.0, -20.0, 0.0};
+
+
     Linear_Interpolation linear_interpolation(x, y, 0.01);
     linear_interpolation.interpolateWaypoints();
     std::vector<Eigen::VectorXd> wp_interp = linear_interpolation.getWp_interp();
