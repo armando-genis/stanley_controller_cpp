@@ -90,7 +90,7 @@ void StanleyController::findClosestWaypoint(double current_x, double current_y,c
     // :return: (vector<Eigen::VectorXd>) subset of waypoints
     // ---------------------------------------------------------------------
 
-    // closest_index = 0;  
+
     double closest_distance = computeDistance(waypoints[closest_index][0], waypoints[closest_index][1], current_x, current_y);
     double new_distance = closest_distance;
     size_t new_index = closest_index;
@@ -181,7 +181,7 @@ void StanleyController::computeSteeringAngle(double current_yaw, double v){
     double yaw_path = std::atan2(new_waypoints.back()[1]-new_waypoints.front()[1], new_waypoints.back()[0]-new_waypoints.front()[0]);
     yaw_path = GetNormaliceAngle(yaw_path);
     cout << "yaw_path: " << yaw_path << endl;
-    double theta_e = yaw_path - current_yaw;
+    double theta_e = GetNormaliceAngle(yaw_path - current_yaw);
     // theta_e corrects the heading error
     double theta_d = atan2(K * error_front_axle, v);
     delta = theta_e + theta_d;
