@@ -2,6 +2,8 @@
  santly control in c++
 
 
+![Demo GIF](https://github.com/armando-genis/stanley_controller_cpp/blob/main/raw/images/car_stanley.gif)
+
 ## Installation
 
  ```bash
