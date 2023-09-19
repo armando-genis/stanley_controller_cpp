@@ -4,7 +4,7 @@
 class BicycleModel {
 private:
     double x, y, theta, v, yaw;
-    const double L = 2.0;
+    const double L = 0.40;
 
 public:
     BicycleModel(double x0, double y0, double theta0, double v0);

@@ -2,7 +2,7 @@
 
 StanleyController::StanleyController(vector<Eigen::VectorXd> waypoints) : waypoints(waypoints)
 {
-    max_steer = GetAngleToRadians(30.0);
+    max_steer = GetAngleToRadians(40.0);
 }
 
 StanleyController::~StanleyController()
@@ -90,48 +90,27 @@ void StanleyController::findClosestWaypoint(double current_x, double current_y,c
     // :return: (vector<Eigen::VectorXd>) subset of waypoints
     // ---------------------------------------------------------------------
 
-
-    double closest_distance = computeDistance(waypoints[closest_index][0], waypoints[closest_index][1], current_x, current_y);
-    double new_distance = closest_distance;
-    size_t new_index = closest_index;
-
-    while (new_distance <= closest_distance) {
-        closest_distance = new_distance;
-        closest_index = new_index;
-        new_index++;
-        if (new_index >= waypoints.size()) {  
-            break;
-        }
-        new_distance = computeDistance(waypoints[new_index][0], waypoints[new_index][1], current_x, current_y);
+    // Compute distance to each waypoint
+    vector<double> distances;
+    for (size_t i = 0; i < waypoints.size(); i++) {
+        distances.push_back(computeDistance(waypoints[i][0], waypoints[i][1], current_x, current_y));
     }
 
-    new_distance = closest_distance;
-    new_index = closest_index;
+    // Find the index of the closest waypoint
+    auto min_dist_it = min_element(distances.begin(), distances.end());
+    closest_index = distance(distances.begin(), min_dist_it);
 
-    while (new_distance <= closest_distance) {
-        closest_distance = new_distance;
-        closest_index = new_index;
-        if (new_index == 0) {  // if at the beginning of the waypoints
-            break;
-        }
-        new_index--;
-        new_distance = computeDistance(waypoints[new_index][0], waypoints[new_index][1], current_x, current_y);
-    }
-    
     // Once the closest index is found, return the path that has 1
     // waypoint behind and X waypoints ahead, where X is the index
     // that has a lookahead distance specified by 
     // INTERP_LOOKAHEAD_DISTANCE = 20
 
-    size_t waypoint_subset_first_index = closest_index - 1;
-    if (waypoint_subset_first_index < 1) {
-        waypoint_subset_first_index = 0;
-    }
+    size_t waypoint_subset_first_index = closest_index > 0 ? closest_index - 1 : 0;
 
     size_t waypoint_subset_last_index = closest_index;
     double total_distance_ahead = 0.0;
 
-    while (total_distance_ahead < 3) {
+    while (total_distance_ahead < 2) {
         if (waypoint_subset_last_index >= waypoints.size() || waypoint_subset_last_index >= wp_distance.size()) {
             waypoint_subset_last_index = std::min(waypoints.size(), wp_distance.size()) - 1;
             break;
